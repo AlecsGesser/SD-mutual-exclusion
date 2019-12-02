@@ -1,27 +1,50 @@
 var express = require('express');
 var app = express();
 var bodyParser = require('body-parser');
-var 
+
 
 app.use(bodyParser.urlencoded({ extended: false }));
 app.use(bodyParser.json());
 
+var server_in_use = false;
+
+function lock(){
+  server_in_use = true;
+}
+
+function unlock(){
+  server_in_use = false;
+}
 
 app.get('/',function(req,res){
     res.sendfile("index.html");
   });
 
-app.post('/login',function(req,res){
-    var user_name=req.body.user;
-    var password=req.body.password;
+app.post('/connect',function(req,res){
+    var user_name=req.body.name;
     console.log("User name = "+user_name+", password is "+password);
-    res.end("done");
+    let msg = {
+      type: 'connect',
+      data: 'sucess'
+    };
+    res.send(JSON.stringify(msg));
 });
 
 app.post('/basicData', function(req, res){
-    
-})
+  if( !server_in_use ){
+    server_in_use=true;
+    //-----DB request ------
 
-  app.listen(3000,function(){
-    console.log("Started on PORT 3000");
-  })
+
+
+    server_in_use=false;
+  }else{
+
+  }
+  
+    
+});
+
+app.listen(3000,function(){
+  console.log("Started on PORT 3000");
+})
