@@ -1,10 +1,27 @@
-const WebSocket = require('ws')
+var express = require('express');
+var app = express();
+var bodyParser = require('body-parser');
+var 
 
-const wss = new WebSocket.Server({ port: 8080 })
+app.use(bodyParser.urlencoded({ extended: false }));
+app.use(bodyParser.json());
 
-wss.on('connection', ws => {
-  ws.on('message', message => {
-    console.log(`Received message => ${message}`)
-  })
-  ws.send('ho!')
+
+app.get('/',function(req,res){
+    res.sendfile("index.html");
+  });
+
+app.post('/login',function(req,res){
+    var user_name=req.body.user;
+    var password=req.body.password;
+    console.log("User name = "+user_name+", password is "+password);
+    res.end("done");
+});
+
+app.post('/basicData', function(req, res){
+    
 })
+
+  app.listen(3000,function(){
+    console.log("Started on PORT 3000");
+  })
