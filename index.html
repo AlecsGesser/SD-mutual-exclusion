@@ -2,23 +2,30 @@
   <head>
     <title>INMET DEBUG INDEX SISTEMAS DISTRIBUIDOS</title>
     <script src="//ajax.googleapis.com/ajax/libs/jquery/2.1.1/jquery.min.js">  </script>
+    
+    <script src="https://cdn.plot.ly/plotly-latest.min.js"></script>  
+  
     <script>
+
+      var user,pass, dataRF, colunas, prediction;
+      var x = [];
+      var y = [];
+
       $(document).ready(function(){
-        var user,pass;
         $("#submit").click(function(){
           user=$("#user").val();
           pass=$("#password").val();
           let msg = {username: user,password: pass};
-          $.post("http://localhost:3000/connect",  
+          $.post("http://"+$("#ip").val()+":3000/connect",  
                   msg , 
                   function(data){
                     data = JSON.parse(data);
                     console.log(data.data);
                   });
         });
-
+        
         $("#select").click(function(){
-          $.post("http://localhost:3000/select",
+          $.post("http://"+$("#ip").val()+":3000/basicData",
                   function(data){
                     console.log(JSON.parse(data));
                   });  
@@ -29,25 +36,135 @@
         $("#server").click(function(){
           user=$("#user").val();
           pass=$("#password").val();
-          let msg = {username: user,password: pass};
-          $.post("http://localhost:3000/randomForest",  
-                  msg, 
+          let msg = {username: user, parameter: $('#Para1').val(), start: $('#startDate').val() , end: $('#endDate').val(), city: $('#Para2').val()};
+          $.post("http://"+$("#ip").val()+":3000/randomForest", 
+                 msg, 
                   function(data){
-                    //data = JSON.parse(data);
-                    console.log(data);
+                    data = JSON.parse(data);
+                    var data = [{
+                        type: 'bar',
+                        x: data.x,
+                        y: data.label,
+                        orientation: 'h'
+                      }];
+
+                      Plotly.newPlot('myDiv', data);
                   });
         });
+        $("#getcols").click(function(){
+          $.post("http://"+$("#ip").val()+":3000/select",  
+                  
+                  function(data){
+                    let dropdown = $('#Para1');
+                    data = JSON.parse(data)
+                    colunas = data;
+                    console.log(data)
+                    dropdown.empty();
+                    
+
+                    dropdown.append('<option selected="true" disabled>Choose Colunas</option>');
+                    dropdown.prop('selectedIndex', 0);
+                    for(let i = 0; i < data.columns.length ; i++){
+                      dropdown.append($('<option></option>').attr('value', data.columns[i]).text(data.columns[i]));
+                    }
+
+                    let dropdown2 = $('#Para2');
+                                 
+
+                    dropdown2.append('<option selected="true" disabled>Choose Cidade</option>');
+                    dropdown2.prop('selectedIndex', 0);
+                    for(let i = 0; i < data.capitais.length ; i++){
+                      dropdown2.append($('<option></option>').attr('value', data.capitais[i]).text(data.capitais[i]));
+                    }
+                  
+                  });
+        });
+
+        $('#Para1').click(function(){
+          prediction = $('select').val();
+          
+        })
+
+        $("#add").click(function(){
+          $.post("http://"+$("#ip").val()+":3000/add",  
+                  function(data){
+                    console.log("bla")
+                  });
+        });
+
+        
+
+        $("#visualise").click(function(){
+          user=$("#user").val();
+          pass=$("#password").val();
+          let msg = { parameter: prediction, city: $("#Para2").val(), start: $("#startDate").val(), end: $("#endDate").val() };
+          $.post("http://"+$("#ip").val()+":3000/visualise", 
+                 msg, 
+                  function(data){
+                    data = JSON.parse(data);
+
+                    console.log(data);
+                    x = [];
+                    y = [];
+                    for(let i = 0 ; i < data.data.length ; i++){
+                      x.push( data.data[i].measure_date);
+                      y.push( data.data[i][prediction]  );
+                    }                         
+                    var data = [
+                       {
+                          x: x,
+                          y: y,
+                          type: 'line'
+                       }
+                     ];
+
+                     Plotly.newPlot('myDiv', data);
+                  });
+        });
+
+        
+
+
+
+
+          
         
       });
+ 
+
     </script>
   </head>
   <body>
     <h5>DEBUG POST REQUESTS !</h5>
-    <input type="TEXT" id="user" size="40"><br>
-    <input type="password" id="password" size="40"><br>
+    <div>
+        <p>IP: <input type="TEXT" id="ip" size="40"><br></p> 
+        <p>Username: <input type="TEXT" id="user" size="40"><br></p> 
+        <p>Password: <input type="password" id="password" size="40"><br></p>
+        <p>Start Date: <input type="date" id="startDate" value="StartDate"></p>
+        <p>End Date: <input type="date" id="endDate" value="EndDate"></p>
+        <p>Predict Parameter Y: <select id="Para1"></select></p>
+        <p>Localization: <select id="Para2"></select></p>
+
+    </div>
+
+
     <input type="button" id="submit" value="Submit">
     <input type="button" id="select" value="Select">
     <input type="button" id="server" value="Server">
+    <input type="button" id="getcols" value="Get Colunas">
+    <input type="button" id="visualise" value="Visualise">
+    <input type="button" id="add" value="Add">
+
+
+
+
+
+  
+    <div id="myDiv" ></div>
+
+
 
   </body>
+ 
+
 </html>

@@ -36,4 +36,4 @@ node server.js
 
 ## Navegador
 
-Abra o seguinte link em seu navegador: [link](localhost:3000)
+Abra o seguinte link em seu navegador: [link](http://localhost:3000)
