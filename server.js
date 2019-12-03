@@ -221,8 +221,8 @@ app.post('/randomForest',function(req,res){
   console.log("POST RANDOMFOREST");
   //console.log(req.body);
   console.log("server status: "+server_in_use);
-  if( server_in_use%2 == 0){
-    server_in_use++;
+  if( server_in_use == 0){
+    server_in_use=1;
     console.log("server status: "+server_in_use);
 
     // PYTHON CALL
@@ -243,7 +243,7 @@ app.post('/randomForest',function(req,res){
         x: x,
         label: label
       }
-      server_in_use++;
+      server_in_use=0;
 
       res.send(JSON.stringify(msg))
     })
@@ -254,6 +254,7 @@ app.post('/randomForest',function(req,res){
     // add to waiting list
     // waiting list response
     // test se ja esta na list dai nao adiciona
+    
     console.log("pasosu wainting list")
     waiting_list.push(req.body.username);
     console.log('username: ', req.body.username);

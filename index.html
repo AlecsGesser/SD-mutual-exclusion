@@ -2,7 +2,6 @@
   <head>
     <title>INMET DEBUG INDEX SISTEMAS DISTRIBUIDOS</title>
     <script src="//ajax.googleapis.com/ajax/libs/jquery/2.1.1/jquery.min.js">  </script>
-    
     <script src="https://cdn.plot.ly/plotly-latest.min.js"></script>  
   
     <script>
@@ -13,6 +12,7 @@
 
       $(document).ready(function(){
         $("#submit").click(function(){
+          //--------------------------------------------------------------------------SUBMIT-------------------------------------------------------------------------------------------//
           user=$("#user").val();
           pass=$("#password").val();
           let msg = {username: user,password: pass};
@@ -24,16 +24,9 @@
                   });
         });
         
-        $("#select").click(function(){
-          $.post("http://"+$("#ip").val()+":3000/basicData",
-                  function(data){
-                    console.log(JSON.parse(data));
-                  });  
-                   
-                  
-        });
+         $("#server").click(function(){
+          //--------------------------------------------------------------------------SERVER----------------------------------------------------------------------------------------------//
 
-        $("#server").click(function(){
           user=$("#user").val();
           pass=$("#password").val();
           let msg = {username: user, parameter: $('#Para1').val(), start: $('#startDate').val() , end: $('#endDate').val(), city: $('#Para2').val()};
@@ -41,6 +34,10 @@
                  msg, 
                   function(data){
                     data = JSON.parse(data);
+                    if( data.type == 'waiting'){
+
+                    }else{
+
                     var data = [{
                         type: 'bar',
                         x: data.x,
@@ -49,9 +46,13 @@
                       }];
 
                       Plotly.newPlot('myDiv', data);
+                    }
                   });
+                
+                
         });
         $("#getcols").click(function(){
+          //--------------------------------------------------------------------------GET COLUNAS----------------------------------------------------------------------------------------------//
           $.post("http://"+$("#ip").val()+":3000/select",  
                   
                   function(data){
@@ -79,20 +80,7 @@
                   
                   });
         });
-
-        $('#Para1').click(function(){
-          prediction = $('select').val();
-          
-        })
-
-        $("#add").click(function(){
-          $.post("http://"+$("#ip").val()+":3000/add",  
-                  function(data){
-                    console.log("bla")
-                  });
-        });
-
-        
+        //--------------------------------------------------------------------------VISUALIZAR DADOS----------------------------------------------------------------------------------------------//
 
         $("#visualise").click(function(){
           user=$("#user").val();
@@ -122,20 +110,32 @@
                   });
         });
 
-        
-
-
-
-
+        $('#Para1').click(function(){
+          prediction = $('select').val();
           
-        
-      });
- 
+        })
 
+        $("#add").click(function(){
+          $.post("http://"+$("#ip").val()+":3000/add",  
+                  function(data){
+                    console.log("bla")
+                  });
+        });
+
+        $("#select").click(function(){
+          $.post("http://"+$("#ip").val()+":3000/basicData",
+                  function(data){
+                    console.log(JSON.parse(data));
+                  });  
+                   
+                  
+        });
+      });
     </script>
   </head>
   <body>
     <h5>DEBUG POST REQUESTS !</h5>
+    <h5 id='server_status'></h5>
     <div>
         <p>IP: <input type="TEXT" id="ip" size="40"><br></p> 
         <p>Username: <input type="TEXT" id="user" size="40"><br></p> 
@@ -144,7 +144,6 @@
         <p>End Date: <input type="date" id="endDate" value="EndDate"></p>
         <p>Predict Parameter Y: <select id="Para1"></select></p>
         <p>Localization: <select id="Para2"></select></p>
-
     </div>
 
 
@@ -154,11 +153,6 @@
     <input type="button" id="getcols" value="Get Colunas">
     <input type="button" id="visualise" value="Visualise">
     <input type="button" id="add" value="Add">
-
-
-
-
-
   
     <div id="myDiv" ></div>
 
