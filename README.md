@@ -15,11 +15,22 @@ Porém, essa técnica pode causar vários efeitos colaterais, como deadlocks, em
 
 ![alt text](https://www.draw.io/?lightbox=1&highlight=0000ff&edit=_blank&layers=1&nav=1#G1QOefpwYBtgB05wIfZFSQi_QPMOH2UWd8)
 
-## Uso
+## Instalação
+
+```sheel 
+Python3 required
+NODEJS required
+```
+
+## Node Package Manager NPM
+
+
 
 ```sheel 
 npm install express
 npm install body-parser
+npm install axios
+npm install sqlite3
 node server.js
 ```
 
