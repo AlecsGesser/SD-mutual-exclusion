@@ -30,7 +30,7 @@
           user=$("#user").val();
           pass=$("#password").val();
           let msg = {username: user,password: pass};
-          $.post("http://localhost:3000/randomForest",  
+          $.post("http://localhost:5000/server",  
                   msg, 
                   function(data){
                     //data = JSON.parse(data);

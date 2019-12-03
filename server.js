@@ -2,6 +2,7 @@ var express = require('express');
 var app = express();
 var bodyParser = require('body-parser');
 const sqlite3 = require('sqlite3');
+const axios = require('axios')
 
 const columns = {};
 const waiting_list = [];
@@ -30,7 +31,7 @@ function unlock(){
 
 app.get('/debug',function(req,res){
   console.log("POST DEBUG");
-  res.sendfile("index.html");
+  res.sendfile("/index.html");
 });
 
 
@@ -155,10 +156,20 @@ app.post('/visualise',function(req,res){
 
 app.post('/randomForest',function(req,res){
   console.log("POST RANDOMFOREST");
-  console.log(req.body);
+  //console.log(req.body);
   if( !server_in_use){
     lock();
     // PYTHON CALL
+    axios.post('http://localhost:5000/server', {
+      todo: 'buy the milk'
+    })
+    .then((res) => {
+      //console.log('statusCode'+ res.statusCode)
+      //console.log(res)
+    })
+    .catch((error) => {
+      console.error(error)
+    })
 
     let variable = [
       ['temp', 0.8],
