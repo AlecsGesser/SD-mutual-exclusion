@@ -1,0 +1,148 @@
+<html>
+
+<head>
+  <!------------------------------------------------------------------------ INCLUDE DEPENDECIES ------------------------------------------------------------------------------------>
+  <title>INMET DEBUG INDEX SISTEMAS DISTRIBUIDOS</title>
+  <script src="//ajax.googleapis.com/ajax/libs/jquery/2.1.1/jquery.min.js">  </script>
+  <script src="https://cdn.plot.ly/plotly-latest.min.js"></script>
+
+  <script>
+    //--------------------------------------------------------------------------GLOBAL VARIABLES-------------------------------------------------------------------------------------//
+    var user, pass;
+    var dataRF, colunas, prediction;
+    var x = []; // Visualization data
+    var y = []; // Visualization data
+
+    $(document).ready(function () {
+      $("#connect").click(function () {
+        //--------------------------------------------------------------------------CONNECT-------------------------------------------------------------------------------------------//
+        user = $("#user").val();
+        pass = $("#password").val();
+        let msg = { username: user, password: pass };
+        $.post("http://" + $("#ip").val() + ":3000/connect",
+          msg,
+          function (data) {
+            data = JSON.parse(data);
+            console.log(data.data);
+          });
+      });
+
+      $("#server").click(function () {
+        //--------------------------------------------------------------------------SERVER----------------------------------------------------------------------------------------------//
+
+        user = $("#user").val();
+        pass = $("#password").val();
+        let msg = { username: user, parameter: $('#ParaY').val(), start: $('#startDate').val(), end: $('#endDate').val(), city: $('#city').val() };
+        $.post("http://" + $("#ip").val() + ":3000/randomForest",
+          msg,
+          function (data) {
+            data = JSON.parse(data);
+            let dropdown = $('#waiting');
+            dropdown.empty();
+            for (let i = 0; i < data.list.length; i++) {
+              dropdown.append($('<p></p>').text(data.list[i]));
+            }
+
+            if (data.type != `waiting`) {
+              var dados = [{
+                type: 'bar',
+                x: data.x,
+                y: data.label,
+                orientation: 'h'
+              }];
+
+
+              //-----------------------------------------PLOT DATA--------------------------------------------------------------------------------------------------------------------//
+              Plotly.newPlot('PLOTDIV', dados);
+            }
+
+          });
+      });
+      $("#getcols").click(function () {
+        //--------------------------------------------------------------------------GET COLUNAS----------------------------------------------------------------------------------------------//
+        $.post("http://" + $("#ip").val() + ":3000/getcols",
+
+          function (data) {
+            let dropdown = $('#ParaY');
+            data = JSON.parse(data)
+            colunas = data;
+            console.log(data)
+            dropdown.empty();
+
+
+            dropdown.append('<option selected="true" disabled>Choose Colunas</option>');
+            dropdown.prop('selectedIndex', 0);
+            for (let i = 0; i < data.columns.length; i++) {
+              dropdown.append($('<option></option>').attr('value', data.columns[i]).text(data.columns[i]));
+            }
+
+            let dropdown2 = $('#city');
+
+
+            dropdown2.append('<option selected="true" disabled>Choose Cidade</option>');
+            dropdown2.prop('selectedIndex', 0);
+            for (let i = 0; i < data.capitais.length; i++) {
+              dropdown2.append($('<option></option>').attr('value', data.capitais[i]).text(data.capitais[i]));
+            }
+
+          });
+      });
+      //--------------------------------------------------------------------------VISUALIZAR DADOS----------------------------------------------------------------------------------------------//
+
+      $("#visualise").click(function () {
+        user = $("#user").val();
+        pass = $("#password").val();
+        let msg = { parameter: $('#ParaY').val(), city: $("#city").val(), start: $("#startDate").val(), end: $("#endDate").val() };
+        $.post("http://" + $("#ip").val() + ":3000/visualise", msg,
+          function (data) {
+            data = JSON.parse(data);
+            console.log(data);
+            x = [];
+            y = [];
+            for (let i = 0; i < data.data.length; i++) {
+              x.push(data.data[i].measure_date);
+              y.push(data.data[i][$('#ParaY').val()]);
+            }
+            var data = [
+              {
+                x: x,
+                y: y,
+                type: 'line'
+              }];
+            //------------------------------------------PLOT VISUALISATION-----------------------------------------------------------------------------------------------//
+            Plotly.newPlot('PLOTDIV', data);
+          });
+      });
+    });
+  </script>
+</head>
+
+<body>
+  <h5>SISTEMAS DISTRIBUIDOS</h5>
+  <h7>Dados do Instituto Nacional de Meteorologia</h7>
+  <div>
+    <p>IP: <input type="TEXT" id="ip" size="40"><br></p>
+    <p>Username: <input type="TEXT" id="user" size="40"><br></p>
+    <p>Password: <input type="password" id="password" size="40"><br></p>
+    <p>Start Date: <input type="date" id="startDate" value="StartDate"></p>
+    <p>End Date: <input type="date" id="endDate" value="EndDate"></p>
+    <p>Predict Parameter Y: <select id="ParaY"></select></p>
+    <p>Localization: <select id="city"></select></p>
+    <p>Waiting List:<t id="waiting">
+    </p>
+    </p>
+  </div>
+
+
+  <input type="button" id="connect" value="Connect">
+  <input type="button" id="server" value="Server">
+  <input type="button" id="getcols" value="Get Colunas">
+  <input type="button" id="visualise" value="Visualise">
+
+  <div id="PLOTDIV"></div> <!-- PLOT DIV-->
+
+
+
+</body>
+
+</html>

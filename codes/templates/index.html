@@ -1,0 +1,53 @@
+<html>
+  <head>
+    <title>INMET DEBUG INDEX SISTEMAS DISTRIBUIDOS</title>
+    <script src="//ajax.googleapis.com/ajax/libs/jquery/2.1.1/jquery.min.js">  </script>
+    <script>
+      $(document).ready(function(){
+        var user,pass;
+        $("#submit").click(function(){
+          user=$("#user").val();
+          pass=$("#password").val();
+          let msg = {username: user,password: pass};
+          $.post("http://localhost:3000/connect",  
+                  msg , 
+                  function(data){
+                    data = JSON.parse(data);
+                    console.log(data.data);
+                  });
+        });
+
+        $("#select").click(function(){
+          $.post("http://localhost:3000/select",
+                  function(data){
+                    console.log(JSON.parse(data));
+                  });  
+                   
+                  
+        });
+
+        $("#server").click(function(){
+          user=$("#user").val();
+          pass=$("#password").val();
+          let msg = {username: user,password: pass};
+          $.post("http://localhost:5000/server",  
+                  msg, 
+                  function(data){
+                    //data = JSON.parse(data);
+                    console.log(data);
+                  });
+        });
+        
+      });
+    </script>
+  </head>
+  <body>
+    <h5>DEBUG POST REQUESTS !</h5>
+    <input type="TEXT" id="user" size="40"><br>
+    <input type="password" id="password" size="40"><br>
+    <input type="button" id="submit" value="Submit">
+    <input type="button" id="select" value="Select">
+    <input type="button" id="server" value="Server">
+
+  </body>
+</html>
